@@ -10,8 +10,9 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
 
-    view.setOnClickListener {
-      Toast.makeText(this@MainActivity, "点击了！", Toast.LENGTH_SHORT).show()
-    }
+    //设置了 android:tooltipText 属性, 那么将监听器去掉
+//    view.setOnClickListener {
+//      Toast.makeText(this@MainActivity, "点击了！", Toast.LENGTH_SHORT).show()
+//    }
   }
 }

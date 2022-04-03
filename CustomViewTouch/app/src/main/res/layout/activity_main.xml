@@ -10,6 +10,7 @@
         android:id="@+id/view"
         android:layout_width="300dp"
         android:layout_height="300dp"
+        android:tooltipText="haha"
         android:background="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

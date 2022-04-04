@@ -5,18 +5,24 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import android.widget.OverScroller
+import android.widget.Scroller
 import androidx.core.view.GestureDetectorCompat
+import androidx.core.view.ViewCompat
 import com.hencoder.scalableimageview.dp
 import com.hencoder.scalableimageview.getAvatar
+import kotlin.math.max
+import kotlin.math.min
 
 private val IMAGE_SIZE = 300.dp.toInt()         //图片宽度
 private const val EXTRA_SCALE_FACTOR = 1.5f   //额外缩放比, 为了使得外贴边的时候也能任意滑动
 
 class MyScalableImageView2(context: Context?, attrs: AttributeSet?) : View(context, attrs),
-    GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
+    GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener, Runnable {
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG);
     private val bitmap = getAvatar(resources, IMAGE_SIZE)
@@ -27,7 +33,7 @@ class MyScalableImageView2(context: Context?, attrs: AttributeSet?) : View(conte
     private var offsetX = 0f
     private var offsetY = 0f
     private var smallScale = 0f
-    private var bigScale = 0f
+    private var bigScale = 0f       //图片的最大缩放比率, 乘了额外缩放比
     private var big = false
 
     //缩放比
@@ -42,6 +48,10 @@ class MyScalableImageView2(context: Context?, attrs: AttributeSet?) : View(conte
     private val scaleAnimator: ObjectAnimator by lazy{
         ObjectAnimator.ofFloat(this, "scaleFraction", 0f, 1f) //属性值的起始值为 0, 结束值为 1. 因为想让动画正反都可以, 所以要将 起始值 和 结束值 都填上
     }
+
+    //OverScroller 是一个计算器, 放到 onFling() 中可以帮助计算坐标
+    //当使用 Scroller 时无论初始速度多快都没有效果, 但是使用 OverScroller 时初始速度越快那么滚动的初始速度也越快, 惯性滑动就用 OverScroller
+    private val scroller = Scroller(context) //OverScroller
 
     private val gestureDetector = GestureDetectorCompat(context, this).apply {
         //为 gestureDetector 添加双击监听器, 才能让他支持双击监听。GestureDetectorCompat 的 OnGestureListener 的方法中只有 onDown() 方法用上了, 别的方法都可以不要
@@ -112,7 +122,50 @@ class MyScalableImageView2(context: Context?, attrs: AttributeSet?) : View(conte
         velocityX: Float,
         velocityY: Float
     ): Boolean {
+            //在 onFling() 方法中使用 OverScroller 从而实现惯性滑动
+        //这里也要加 big 判断, 否则在内贴边的时候快速滑动然后松手就会触发 onFling() 方法造成滑动
+        if(big){
+            //velocityX : 横向的速度, 抬起手的时候手滑动有多快
+            //overX : 微信中滑动到底再撒手不是不能滑动了, 而是仍然可以用很慢的速度滑动, 可以惯性滑动过头, 惯性滑动过头后可以复位回来, overX 就是最多可以惯性滑动过头多少距离, OverScroller 提供的就是这个功能
+            scroller.fling(
+                offsetX.toInt(), offsetY.toInt(), velocityX.toInt(), velocityY.toInt(),
+                (-(bitmap.width * bigScale - width) / 2).toInt(),
+                ((bitmap.width * bigScale - width) / 2).toInt(),
+                (-(bitmap.height * bigScale - height) / 2).toInt(),
+                ((bitmap.height * bigScale - height) / 2).toInt(),
+                //40.dp.toInt(), 40.dp.toInt()
+            )
+            //方式一 : 粗暴的使用循环调用 refresh()
+//            for(i in 10..100 step 10){ //从 10 到 100 每过 10ms 就刷新一次
+//                postDelayed({refresh()}, i.toLong())
+//            }
+            //方式二 :
+            //在下一帧调用 postOnAnimation(), 但是这样写会一直创建 runnable 对象, 可以单独写一个 runnable 对象, 但是比较麻烦,
+            //postOnAnimation { refresh() }
+
+            //可以让 MyScalableImageView2 自己实现 Runnable, 然后将 refresh() 改为 run() 即可
+            //postOnAnimation(this)
+
+            //post()
+
+            ViewCompat.postOnAnimation(this, this) //postOnAnimation(view, runnable)  其中 view 表示对哪个 view 做 animation
+            Log.e("TAG", "onFling()  postOnAnimation { refresh() }")
+        }
         return false
+    }
+
+    // fun refresh(){
+    override fun run() {
+        //在需要计算和刷新的时候计算一下当前的值, 类似掐一下表, 计算下模型中小球的当前的位置
+        //scroller.computeScrollOffset() 是有返回值的, 表示动画是否在进行中
+        if(scroller.computeScrollOffset()){
+            //因为 scroller 的起始点就是选的 (offsetX, offsetY), 所以移动到哪新的坐标就仍然是 (offsetX, offsetY), 不需要任何处理
+            offsetX = scroller.currX.toFloat()
+            offsetY = scroller.currY.toFloat()
+            invalidate()
+            Log.e("TAG", "refresh()")
+            postOnAnimation(this) //但是只调用一次 postOnAnimation() 不够, 为了能持续动画, 这里还需要再调用一次, 为了防止一直递归调用, 就需要根据 scroller.computeScrollOffset() 的返回值判断
+        }
     }
 
     //当手指发生移动 (ACTION_MOVE) 的时候这个方法就会被触发, 可以理解为 onMove()
@@ -127,9 +180,22 @@ class MyScalableImageView2(context: Context?, attrs: AttributeSet?) : View(conte
         distanceX: Float,
         distanceY: Float
     ): Boolean {
-        offsetX -= distanceX    //offsetX = offsetX - distanceX = offsetX + (-distanceX)
-        offsetY -= distanceY
-        invalidate()            //移动的时候要刷新界面, 所以调用  invalidate()
+        if(big){
+            offsetX -= distanceX    //offsetX = offsetX - distanceX = offsetX + (-distanceX)
+
+            //因为只有在 big 外贴边的时候图片缩放比才是 bigScale
+            //offsetX 最大不能大于 (bitmap.width * bigScale - width) / 2, 所以选择 offsetX 和 它的最小的值
+            offsetX = min(offsetX, (bitmap.width * bigScale - width) / 2)
+
+            //最小不能小于 (bitmap.width * bigScale - width) / 2 的相反数, 所以选择 offsetX 和 它的最的大值
+            offsetX = max(offsetX, -(bitmap.width * bigScale - width) / 2)
+
+            //需要在 offsetY 修改完再使用 min() 和 max() 防止越界
+            offsetY -= distanceY
+            offsetY = min(offsetY, (bitmap.height * bigScale - height) / 2)
+            offsetY = max(offsetY, -(bitmap.height * bigScale - height) / 2)
+            invalidate()            //移动的时候要刷新界面, 所以调用  invalidate()
+        }
         return false
     }
 

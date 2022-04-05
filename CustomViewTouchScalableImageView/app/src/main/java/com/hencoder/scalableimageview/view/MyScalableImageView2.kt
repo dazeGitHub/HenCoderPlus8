@@ -8,6 +8,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.OverScroller
 import android.widget.Scroller
@@ -36,10 +37,19 @@ class MyScalableImageView2(context: Context?, attrs: AttributeSet?) : View(conte
     private var bigScale = 0f       //图片的最大缩放比率, 乘了额外缩放比
     private var big = false
     private var henGestureListener = HenGestureListener()
+    private var henScaleGestureListener = HenScaleGestureListener()
     private var henFlingRunner = HenFlingRunner()
 
-    //缩放比 放大时 从 0 到 1, 缩小时从 1 到 0
-    private var scaleFraction = 0f  //Fraction : 少部分, 一点
+    //缩放比, 即动画完成度, 放大时 从 0 到 1, 缩小时从 1 到 0
+    //ObjectAnimator.ofFloat() 的动画对 scaleFraction 进行了赋值
+//    private var scaleFraction = 0f  //Fraction : 少部分, 一点
+//        set(value){
+//            field = value
+//            Log.e("TAG", "scaleFraction = $value")
+//            invalidate()
+//        }
+
+    private var currentScale = 0f
         set(value){
             field = value
             Log.e("TAG", "scaleFraction = $value")
@@ -48,10 +58,12 @@ class MyScalableImageView2(context: Context?, attrs: AttributeSet?) : View(conte
 
     //scaleAnimator 的 propertyName 就是 scaleFraction, 所以 scaleAnimator 会不断的修改 scaleFraction 值,
     //而修改 scaleFraction 值就会触发它的 set() 方法, 从而不断的调用 invalidate() 触发 onDraw()
-    private val scaleAnimator: ObjectAnimator by lazy{
-        //属性值的起始值为 0, 结束值为 1. 因为想让动画正反都可以, 所以要将 起始值 和 结束值 都填上
-        ObjectAnimator.ofFloat(this, "scaleFraction", 0f, 1f)
+//  private val scaleAnimator: ObjectAnimator by lazy{
+        //使用 scaleFraction : 属性值的起始值为 0, 结束值为 1. 因为想让动画正反都可以, 所以要将 起始值 和 结束值 都填上
+        //ObjectAnimator.ofFloat(this, "scaleFraction", 0f, 1f)
+
         //因为 onDoubleTap() 的时候重新设置了 offsetX, 所以就不需要在之前动画结束的时候再将 offsetX 设置为 0 了
+        //ObjectAnimator.ofFloat(this, "scaleFraction", 0f, 1f)
 //            .apply{
 //            doOnEnd {
 //                Log.e("TAG", "MyScalableImageView2 scaleAnimator offsetX = 0f offsetY = 0f")
@@ -60,17 +72,30 @@ class MyScalableImageView2(context: Context?, attrs: AttributeSet?) : View(conte
 //                    offsetY = 0f
 //                }
 //            }
-//        }
-    }
+//      }
+//  }
+
+    //currentScale 的初始值已经不是 0 和 1 了
+    //当在 onSizeChanged() 中 smallScale 和 bigScale 改变时还需要更新 scaleAnimator
+    //因为 smallScale 和 bigScale 是会变的, 所以也不能用 by lazy{} 了, 因为 by lazy{} 只会在第一次用的使用才会执行 {} 代码块, 以后都不会执行
+    private val scaleAnimator: ObjectAnimator = ObjectAnimator.ofFloat(this, "currentScale", smallScale, bigScale)
 
     //OverScroller 是一个计算器, 放到 onFling() 中可以帮助计算坐标
     //当使用 Scroller 时无论初始速度多快都没有效果, 但是使用 OverScroller 时初始速度越快那么滚动的初始速度也越快, 惯性滑动就用 OverScroller
     private val scroller = Scroller(context) //OverScroller
 
-    private val gestureDetector = GestureDetectorCompat(context, henGestureListener).apply {
-        //为 gestureDetector 添加双击监听器, 才能让他支持双击监听。GestureDetectorCompat 的 OnGestureListener 的方法中只有 onDown() 方法用上了, 别的方法都可以不要
-        setOnDoubleTapListener(henGestureListener)
-    }
+    //GestureDetector 随着 Android 系统的更新代码也会改变, GestrureDetectorCompat 不随着 Android 系统更新也有最新特性, 所以 GestrureDetectorCompat 对旧版本的 Android 有更好的支持 (手机不用更新系统, 只要 AndroidX 的包更新了, 就能用 AndroidX 的包的新东西)。
+    //一般用 GestrureDetectorCompat, 因为它的兼容性比较好。
+    private val gestureDetector = GestureDetectorCompat(context, henGestureListener)
+//  private val gestureDetector = GestureDetectorCompat(context, henGestureListener).apply {
+//      //为 gestureDetector 添加双击监听器, 才能让他支持双击监听。GestureDetectorCompat 的 OnGestureListener 的方法中只有 onDown() 方法用上了, 别的方法都可以不要
+//      setOnDoubleTapListener(henGestureListener)
+//  }
+
+    //注意 : ScaleGestureDetectorCompat 不是 ScaleGestureDetector 的兼容版本, GestureDetectorCompat 有基础功能也有更多内容, 而 ScaleGestureDetector 是只有更多内容
+    //ScaleGestureDetectorCompat 是兼容性的辅助工具类, 是对 ScaleGestureDetector 兼容性辅助的, 是为 ScaleGestureDetector 添加一些额外内容
+    //所以不能使用 ScaleGestureDetectorCompat 而应当使用 ScaleGestureDetector
+    private val scaleGestureDetector = ScaleGestureDetector(context, henScaleGestureListener)
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
@@ -87,23 +112,41 @@ class MyScalableImageView2(context: Context?, attrs: AttributeSet?) : View(conte
 
         //gestureDetector 默认是支持长按的, 这里可以关闭长按
         //gestureDetector.setIsLongpressEnabled(false)
+
+        currentScale = smallScale
+
+        //
+        scaleAnimator.setFloatValues(smallScale, bigScale)
     }
 
+    //正着想不容易想通, 所以倒着想, 从底下往上看, 画完图 -> 缩放 -> 移动
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
+        //scaleFraction 由全局计算改为通过 currentScale 局部计算
+        val scaleFraction = (currentScale - smallScale) / (bigScale - smallScale)   //Fraction : 小部分, 少量
         Log.e("TAG", "onDraw offsetX = $offsetX  offsetY = $offsetY  scaleFraction = $scaleFraction  (offsetX * scaleFraction) = ${offsetX * scaleFraction}")
-        //正着想不容易想通, 所以倒着想, 从底下往上看, 画完图 -> 缩放 -> 移动
-        canvas?.translate(offsetX * scaleFraction, offsetY * scaleFraction) //* scaleFraction  是为了解决 : 双击时可以移动, 再双击缩小时图片不在界面中心 的问题
-        //val scale = if(big) bigScale else smallScale                      //bigScale
-        val scale = smallScale + (bigScale - smallScale) * scaleFraction    //初始值 + 差值 * 百分比
-        canvas?.scale(scale, scale, width / 2f, height / 2f)        //以 view 的中心 (width / 2f, height / 2f) 做为轴心, 缩放后坐标系也缩放了
+        canvas?.translate(offsetX * scaleFraction, offsetY * scaleFraction) //scaleFraction  是为了解决 : 双击时可以移动, 再双击缩小时图片不在界面中心 的问题
+
+        //这里的 scale 是在算当前的缩放比, 所以有了 currentScale 代替 scale 那么就不需要再用 scaleFraction 来计算 scale 了
+        //所以有 scaleFraction = (scale - smallScale) / (bigScale - smallScale) = (currentScale - smallScale) / (bigScale - smallScale)
+        //
+        //val scale = if(big) bigScale else smallScale                        //bigScale
+        //val scale = smallScale + (bigScale - smallScale) * scaleFraction    //初始值 + 差值 * 百分比
+        //canvas?.scale(scale, scale, width / 2f, height / 2f)        //以 view 的中心 (width / 2f, height / 2f) 做为轴心, 缩放后坐标系也缩放了
+        canvas?.scale(currentScale, currentScale, width / 2f, height / 2f)
+
         canvas?.drawBitmap(bitmap, originalOffsetX, originalOffsetY, paint)
     }
 
     //提示 : Custom view MyScalableImageView2 overrides onTouchEvent but not performClick, 即当前 View 不支持点击, 但是要的效果就是不支持点击, 只支持双击
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        return gestureDetector.onTouchEvent(event)
+        scaleGestureDetector.onTouchEvent(event)
+        //如果 scaleGestureDetector 在捏手指, 那么就不能调用 gestureDetector
+        if(!scaleGestureDetector.isInProgress){
+            gestureDetector.onTouchEvent(event)
+        }
+        return true
     }
 
     //将修正 offsetX 和 offsetY 的操作抽取出来, 做为 fixOffset()
@@ -267,6 +310,60 @@ class MyScalableImageView2(context: Context?, attrs: AttributeSet?) : View(conte
                 Log.e("TAG", "run() offsetX = $offsetX offsetY = $offsetY")
                 ViewCompat.postOnAnimation(this@MyScalableImageView2, this) //但是只调用一次 postOnAnimation() 不够, 为了能持续动画, 这里还需要再调用一次, 为了防止一直递归调用, 就需要根据 scroller.computeScrollOffset() 的返回值判断
             }
+        }
+    }
+
+    inner class HenScaleGestureListener : ScaleGestureDetector.OnScaleGestureListener{
+
+        //手指同时靠近开始时回调这个方法, 这里必须返回 true, 类似于 onDown(), 否则没效果
+        override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
+            offsetX = -(detector.focusX - width / 2f) * ((bigScale / smallScale) - 1)
+            offsetY = -(detector.focusY - height / 2f) * ((bigScale / smallScale) - 1)
+            return true
+        }
+
+        //手指松开的时候调用这个方法
+        override fun onScaleEnd(detector: ScaleGestureDetector?) {
+
+        }
+
+        override fun onScale(detector: ScaleGestureDetector): Boolean { //这个 detector 就是上边创建的 scaleGestureDetector
+
+            //为了解决 手指从无法缩小时再放大 (还没到之前到达 smallScale 边界的位置) 时图片就开始放大 的问题
+            val tempCurrentScale = currentScale * detector.scaleFactor
+            if(tempCurrentScale < smallScale || tempCurrentScale > bigScale){
+                //返回 false 表示不消费事件, 上一次的值会一直保存着
+                return false
+            }else{
+                currentScale *= detector.scaleFactor
+                return true
+            }
+
+            //detector.scaleFactor 获取到实时的放缩系数 :
+            //例如两个手指同时往相反方向移动, 每个移动距离为初始时两根手指距离的一半, 那么移动完毕后两个手指的距离 = 初始时两个手指的距离 * 2, 此时放缩系数为 2
+            //即 放缩系数 = 移动完的双指的距离 / 移动开始时双指的距离
+            //当两个手指缩小到很小那么 detector.scaleFactor 也可能是 0, 也可能无穷大, 即范围是 0-无穷
+            //现在要做的是放缩, 所以要修改 scaleFraction (动画完成度), scaleFraction 的取值范围 0-1, 这两个区间不同, 比较难映射
+            //但是之前有 : smallScale < 图片放缩系数 < bigScale, 如果不考虑各种限制, 那么图片放缩系数也可以是 0-无穷
+            //scaleFraction = detector.scaleFactor
+
+            //即不要写 scaleFraction, 而是换一个值 currentScale
+            //当前值 = 上一个状态的值 * (当前状态/上一状态的缩放系数)
+            //detector.scaleFactor 可以获取到 [当前状态/初始状态的缩放系数] 和 [当前状态/上一状态的缩放系数], 关键看返回值
+            currentScale *= detector.scaleFactor
+            Log.e("TAG", "onScale currentScale Pre currentScale = $currentScale  detector.scaleFactor = ${detector.scaleFactor}" )
+
+            //防止缩放越界
+            //currentScale = max(smallScale, currentScale)
+            //currentScale = min(bigScale, currentScale)
+            //上述写法也可以这么写
+            currentScale = currentScale.coerceAtLeast(smallScale).coerceAtMost(bigScale)
+            Log.e("TAG", "onScale coerceAt Back currentScale = $currentScale  smallScale = $smallScale bigScale = $bigScale")
+
+            //如果这里返回 false, 表示不消费, 下一次 onScale() 这里 detector.scaleFactor 返回的就是 [当前状态/初始状态的缩放系数]
+            //如果这里返回 true,  表示消费,   下一次 onScale() 这里 detector.scaleFactor 返回的就是 [当前状态/上一状态的缩放系数]
+            //所以这里返回 true, 这里的返回值不和 onFling() 和 onScroll() 一样没有意义, 这个是有意义的
+            return true
         }
     }
 }

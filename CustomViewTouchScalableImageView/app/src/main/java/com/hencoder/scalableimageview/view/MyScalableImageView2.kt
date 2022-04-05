@@ -357,7 +357,7 @@ class MyScalableImageView2(context: Context?, attrs: AttributeSet?) : View(conte
             //currentScale = max(smallScale, currentScale)
             //currentScale = min(bigScale, currentScale)
             //上述写法也可以这么写
-            currentScale = currentScale.coerceAtLeast(smallScale).coerceAtMost(bigScale)
+            currentScale = currentScale.coerceAtLeast(smallScale).coerceAtMost(bigScale) //coerce : 胁迫
             Log.e("TAG", "onScale coerceAt Back currentScale = $currentScale  smallScale = $smallScale bigScale = $bigScale")
 
             //如果这里返回 false, 表示不消费, 下一次 onScale() 这里 detector.scaleFactor 返回的就是 [当前状态/初始状态的缩放系数]

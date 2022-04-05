@@ -11,6 +11,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.OverScroller
 import android.widget.Scroller
+import androidx.core.animation.doOnEnd
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.ViewCompat
 import com.hencoder.scalableimageview.dp
@@ -36,17 +37,29 @@ class MyScalableImageView2(context: Context?, attrs: AttributeSet?) : View(conte
     private var bigScale = 0f       //图片的最大缩放比率, 乘了额外缩放比
     private var big = false
 
-    //缩放比
+    //缩放比 放大时 从 0 到 1, 缩小时从 1 到 0
     private var scaleFraction = 0f  //Fraction : 少部分, 一点
         set(value){
             field = value
+            Log.e("TAG", "scaleFraction = $value")
             invalidate()
         }
 
     //scaleAnimator 的 propertyName 就是 scaleFraction, 所以 scaleAnimator 会不断的修改 scaleFraction 值,
     //而修改 scaleFraction 值就会触发它的 set() 方法, 从而不断的调用 invalidate() 触发 onDraw()
     private val scaleAnimator: ObjectAnimator by lazy{
-        ObjectAnimator.ofFloat(this, "scaleFraction", 0f, 1f) //属性值的起始值为 0, 结束值为 1. 因为想让动画正反都可以, 所以要将 起始值 和 结束值 都填上
+        //属性值的起始值为 0, 结束值为 1. 因为想让动画正反都可以, 所以要将 起始值 和 结束值 都填上
+        ObjectAnimator.ofFloat(this, "scaleFraction", 0f, 1f)
+        //因为 onDoubleTap() 的时候重新设置了 offsetX, 所以就不需要在之前动画结束的时候再将 offsetX 设置为 0 了
+//            .apply{
+//            doOnEnd {
+//                Log.e("TAG", "MyScalableImageView2 scaleAnimator offsetX = 0f offsetY = 0f")
+//                if(!big){
+//                    offsetX = 0f
+//                    offsetY = 0f
+//                }
+//            }
+//        }
     }
 
     //OverScroller 是一个计算器, 放到 onFling() 中可以帮助计算坐标
@@ -78,8 +91,9 @@ class MyScalableImageView2(context: Context?, attrs: AttributeSet?) : View(conte
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
+        Log.e("TAG", "onDraw offsetX = $offsetX  offsetY = $offsetY  scaleFraction = $scaleFraction  (offsetX * scaleFraction) = ${offsetX * scaleFraction}")
         //正着想不容易想通, 所以倒着想, 从底下往上看, 画完图 -> 缩放 -> 移动
-        canvas?.translate(offsetX, offsetY)
+        canvas?.translate(offsetX * scaleFraction, offsetY * scaleFraction) //* scaleFraction  是为了解决 : 双击时可以移动, 再双击缩小时图片不在界面中心 的问题
         //val scale = if(big) bigScale else smallScale                      //bigScale
         val scale = smallScale + (bigScale - smallScale) * scaleFraction    //初始值 + 差值 * 百分比
         canvas?.scale(scale, scale, width / 2f, height / 2f)        //以 view 的中心 (width / 2f, height / 2f) 做为轴心, 缩放后坐标系也缩放了
@@ -163,7 +177,7 @@ class MyScalableImageView2(context: Context?, attrs: AttributeSet?) : View(conte
             offsetX = scroller.currX.toFloat()
             offsetY = scroller.currY.toFloat()
             invalidate()
-            Log.e("TAG", "refresh()")
+            Log.e("TAG", "run() offsetX = $offsetX offsetY = $offsetY")
             postOnAnimation(this) //但是只调用一次 postOnAnimation() 不够, 为了能持续动画, 这里还需要再调用一次, 为了防止一直递归调用, 就需要根据 scroller.computeScrollOffset() 的返回值判断
         }
     }
@@ -194,6 +208,8 @@ class MyScalableImageView2(context: Context?, attrs: AttributeSet?) : View(conte
             offsetY -= distanceY
             offsetY = min(offsetY, (bitmap.height * bigScale - height) / 2)
             offsetY = max(offsetY, -(bitmap.height * bigScale - height) / 2)
+
+            Log.d("TAG", "onScroll offsetX = $offsetX offsetY = $offsetY")
             invalidate()            //移动的时候要刷新界面, 所以调用  invalidate()
         }
         return false
@@ -209,11 +225,17 @@ class MyScalableImageView2(context: Context?, attrs: AttributeSet?) : View(conte
     //双击 : 按下抬起再按下就会触发, 第一次按下与第二次按下有很短的时间间隔 300ms,
     //还会防手抖 : 如果两次点击间隔时间太短 (40ms), 那么也不算
     //返回值也没用
-    override fun onDoubleTap(e: MotionEvent?): Boolean {
+    override fun onDoubleTap(e: MotionEvent): Boolean {
         big = !big //使用动画后 big 还是有用的, 用来标记正着播放动画还是反着播放动画
         if(big){
+            offsetX = -(e.x - width / 2f) * ((bigScale / smallScale) - 1)
+            offsetY = -(e.y - height / 2f) * ((bigScale / smallScale) - 1)
+            Log.e("TAG", "onDoubleTap offsetX = $offsetX offsetY = $offsetY")
             scaleAnimator.start()
         }else{
+            //这里直接设置为 0 会导致突兀的复位到屏幕中心
+//            offsetX = 0f
+//            offsetY = 0f
             scaleAnimator.reverse()
         }
         //invalidate() //触发 onDraw(), 使用动画后就不用在这里 invalidate() 了

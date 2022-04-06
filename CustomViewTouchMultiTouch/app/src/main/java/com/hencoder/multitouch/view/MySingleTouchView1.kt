@@ -11,7 +11,7 @@ import com.hencoder.multitouch.dp
 import com.hencoder.multitouch.getAvatar
 
 /**
- * 多点触摸的第一种情况 : 接力型
+ * 单点触摸
  */
 class MySingleTouchView1(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)

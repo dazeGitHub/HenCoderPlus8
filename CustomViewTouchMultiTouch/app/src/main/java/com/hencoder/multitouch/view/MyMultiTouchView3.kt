@@ -64,12 +64,13 @@ class MyMultiTouchView3(context: Context?, attrs: AttributeSet?) : View(context,
 //                    val path = paths.get(pointerId)
 //                    Log.d("TAG", "pointerId = $pointerId pointerIndex = $pointerIndex index = $index")
 //                    path.lineTo(event.getX(pointerIndex), event.getY(pointerIndex))
-//                    Log.e("TAG", "ACTION_MOVE paths.size() = ${paths.size()} event.getPointerCount = ${event.pointerCount}")
 
                     //这个会崩溃
                     val pointerId = event.getPointerId(index)
                     val path = paths.get(pointerId)
                     path.lineTo(event.getX(index), event.getY(index))
+
+                    Log.e("TAG", "ACTION_MOVE paths.size() = ${paths.size()} event.getPointerCount = ${event.pointerCount} index = $index")
                 }
                 invalidate()
             }

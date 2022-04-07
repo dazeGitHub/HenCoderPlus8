@@ -120,6 +120,7 @@ class TwoPager(context: Context, attrs: AttributeSet) : ViewGroup(context, attrs
                 val scrollDistance = if (targetPage == 1) width - scrollX else -scrollX
                 //之前是使用 OverScroller 的 fling() 方法实现惯性滚动, 这里使用 startScroll() 方法
                 //给一个目标位置, 自己算应该如何移动过去, 到达的时候要求速度刚好是0
+                //void startScroll(int startX, int startY, int dx, int dy) { }
                 overScroller.startScroll(getScrollX(), 0, scrollDistance, 0)
                 //postOnAnimation(runnable) 是在下一帧执行 runnable, 而 postInvalidateOnAnimation() 却没有参数
                 //将界面标记为失效, 因为没有 runnable 代码, 所以使用 computeScroll() 方法
@@ -130,6 +131,7 @@ class TwoPager(context: Context, attrs: AttributeSet) : ViewGroup(context, attrs
     }
 
     override fun computeScroll() {
+        //使用 overScroller.computeScrollOffset() 终止循环
         if (overScroller.computeScrollOffset()) {
             scrollTo(overScroller.currX, overScroller.currY)
             postInvalidateOnAnimation() //自动将界面标记为失效, 下一帧到的时候 draw() 方法就会被调用, draw() 方法里又会调用 computeScroll()

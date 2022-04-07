@@ -12,6 +12,7 @@ import com.hencoder.multitouch.getAvatar
 
 /**
  * 多点触摸的第一种情况 : 接力型
+ * 多点触控手指接力实现图像移动
  */
 class MyMultiTouchView1(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)

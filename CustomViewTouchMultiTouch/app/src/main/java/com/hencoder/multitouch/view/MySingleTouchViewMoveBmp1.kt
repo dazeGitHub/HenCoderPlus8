@@ -11,9 +11,9 @@ import com.hencoder.multitouch.dp
 import com.hencoder.multitouch.getAvatar
 
 /**
- * 单点触摸
+ * 单点触摸, 移动图像
  */
-class MySingleTouchView1(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
+class MySingleTouchViewMoveBmp1(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val bitmap = getAvatar(resources, 200.dp.toInt())
     private var originalOffsetX = 0f

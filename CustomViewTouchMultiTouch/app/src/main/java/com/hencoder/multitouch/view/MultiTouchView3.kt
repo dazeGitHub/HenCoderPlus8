@@ -12,6 +12,7 @@ import com.hencoder.multitouch.dp
 
 /**
  * 多点触摸的第三种情况 : 各自为战型
+ * 多指画图
  */
 class MultiTouchView3(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)

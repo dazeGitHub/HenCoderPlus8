@@ -82,7 +82,7 @@ class MyScalableImageView2(context: Context?, attrs: AttributeSet?) : View(conte
 
     //OverScroller 是一个计算器, 放到 onFling() 中可以帮助计算坐标
     //当使用 Scroller 时无论初始速度多快都没有效果, 但是使用 OverScroller 时初始速度越快那么滚动的初始速度也越快, 惯性滑动就用 OverScroller
-    private val scroller = Scroller(context) //OverScroller
+    private val scroller = OverScroller(context) //OverScroller //Scroller
 
     //GestureDetector 随着 Android 系统的更新代码也会改变, GestrureDetectorCompat 不随着 Android 系统更新也有最新特性, 所以 GestrureDetectorCompat 对旧版本的 Android 有更好的支持 (手机不用更新系统, 只要 AndroidX 的包更新了, 就能用 AndroidX 的包的新东西)。
     //一般用 GestrureDetectorCompat, 因为它的兼容性比较好。

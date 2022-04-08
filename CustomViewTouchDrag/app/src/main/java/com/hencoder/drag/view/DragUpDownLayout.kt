@@ -11,51 +11,53 @@ import androidx.core.view.ViewCompat
 import androidx.customview.widget.ViewDragHelper
 import kotlinx.android.synthetic.main.drag_up_down.view.*
 
-
+/**
+ * 使用 ViewDragHelper 实现拖拽
+ */
 class DragUpDownLayout(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs) {
-  private var dragListener: ViewDragHelper.Callback = DragCallback()
-  private var dragHelper: ViewDragHelper = ViewDragHelper.create(this, dragListener)
-  private var viewConfiguration: ViewConfiguration = ViewConfiguration.get(context)
+    private var dragListener: ViewDragHelper.Callback = DragCallback()
+    private var dragHelper: ViewDragHelper = ViewDragHelper.create(this, dragListener)
+    private var viewConfiguration: ViewConfiguration = ViewConfiguration.get(context)
 
-  override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
-    return dragHelper.shouldInterceptTouchEvent(ev)
-  }
-
-  override fun onTouchEvent(event: MotionEvent): Boolean {
-    dragHelper.processTouchEvent(event)
-    return true
-  }
-
-  override fun computeScroll() {
-    if (dragHelper.continueSettling(true)) {
-      ViewCompat.postInvalidateOnAnimation(this)
-    }
-  }
-
-  internal inner class DragCallback : ViewDragHelper.Callback() {
-    override fun tryCaptureView(child: View, pointerId: Int): Boolean {
-      return child === draggedView
+    override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
+        return dragHelper.shouldInterceptTouchEvent(ev)
     }
 
-    override fun clampViewPositionVertical(child: View, top: Int, dy: Int): Int {
-      return top
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        dragHelper.processTouchEvent(event)
+        return true
     }
 
-    override fun onViewReleased(releasedChild: View, xvel: Float, yvel: Float) {
-      if (Math.abs(yvel) > viewConfiguration.scaledMinimumFlingVelocity) {
-        if (yvel > 0) {
-          dragHelper.settleCapturedViewAt(0, height - releasedChild.height)
-        } else {
-          dragHelper.settleCapturedViewAt(0, 0)
+    override fun computeScroll() {
+        if (dragHelper.continueSettling(true)) {
+            ViewCompat.postInvalidateOnAnimation(this)
         }
-      } else {
-        if (releasedChild.top < height - releasedChild.bottom) {
-          dragHelper.settleCapturedViewAt(0, 0)
-        } else {
-          dragHelper.settleCapturedViewAt(0, height - releasedChild.height)
-        }
-      }
-      postInvalidateOnAnimation()
     }
-  }
+
+    internal inner class DragCallback : ViewDragHelper.Callback() {
+        override fun tryCaptureView(child: View, pointerId: Int): Boolean {
+            return child === draggedView
+        }
+
+        override fun clampViewPositionVertical(child: View, top: Int, dy: Int): Int {
+            return top
+        }
+
+        override fun onViewReleased(releasedChild: View, xvel: Float, yvel: Float) {
+            if (Math.abs(yvel) > viewConfiguration.scaledMinimumFlingVelocity) {
+                if (yvel > 0) {
+                    dragHelper.settleCapturedViewAt(0, height - releasedChild.height)
+                } else {
+                    dragHelper.settleCapturedViewAt(0, 0)
+                }
+            } else {
+                if (releasedChild.top < height - releasedChild.bottom) {
+                    dragHelper.settleCapturedViewAt(0, 0)
+                } else {
+                    dragHelper.settleCapturedViewAt(0, height - releasedChild.height)
+                }
+            }
+            postInvalidateOnAnimation()
+        }
+    }
 }

@@ -26,7 +26,7 @@ class TwoPager(context: Context, attrs: AttributeSet) : ViewGroup(context, attrs
     private var maxVelocity = viewConfiguration.scaledMaximumFlingVelocity
 
     //开始滑动的距离阈值, 每个系统不一样
-    private var pagingSlop = viewConfiguration.scaledPagingTouchSlop
+    private var pagingHorSlop = viewConfiguration.scaledPagingTouchSlop
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         //给所有的子 View 统一的宽和高的限制, 这里填入了自己的宽高限制, 即用我自己的宽高限制来测量子 View, 所有 measureChildren() 这个方法很不常用
@@ -62,19 +62,24 @@ class TwoPager(context: Context, attrs: AttributeSet) : ViewGroup(context, attrs
                 downX = event.x
                 downY = event.y
                 downScrollX = scrollX.toFloat()
-                Log.e("TAG", "onInterceptTouchEvent downX = $downX downY = $downY")
+                Log.e("TAG", "TwoPager onInterceptTouchEvent ACTION_DOWN downX = $downX downY = $downY")
             }
-            MotionEvent.ACTION_MOVE -> if (!scrolling) {
-                val dx = downX - event.x
-                if (abs(dx) > pagingSlop) {
-                    scrolling = true
-                    //当是一个滑动控件时, 并且拦截了子 View 的事件的时候, 除了 onInterceptTouchEvent() 要返回 true 让子 View 收到 Cancel 事件外, 还需要告诉父 View 不要拦截自己了
-                    //例如 ScrollView 在 ViewPager 里边, 当 ScrollView 开始上下滑动的时候, 用户是不希望再左右滑动的
-                    parent.requestDisallowInterceptTouchEvent(true)
-                    result = true
+            MotionEvent.ACTION_MOVE -> {
+                if (!scrolling) {
+                    val dx = downX - event.x
+                    Log.e("TAG", "TwoPager onInterceptTouchEvent ACTION_MOVE dx = ${abs(dx)} pagingHorSlop = $pagingHorSlop")
+                    if (abs(dx) > pagingHorSlop) {
+                        scrolling = true
+                        //当是一个滑动控件时, 并且拦截了子 View 的事件的时候, 除了 onInterceptTouchEvent() 要返回 true 让子 View 收到 Cancel 事件外, 还需要告诉父 View 不要拦截自己了
+                        //例如 ScrollView 在 ViewPager 里边, 当 ScrollView 开始上下滑动的时候, 用户是不希望再左右滑动的
+                        parent.requestDisallowInterceptTouchEvent(true)
+                        result = true
+                    }
                 }
+                Log.e("TAG", "TwoPager onInterceptTouchEvent ACTION_MOVE result = $result")
             }
         }
+        Log.e("TAG", "TwoPager onInterceptTouchEvent result = $result")
         return result
     }
 
@@ -91,14 +96,15 @@ class TwoPager(context: Context, attrs: AttributeSet) : ViewGroup(context, attrs
                 downY = event.y
                 //获取初始偏移量
                 downScrollX = scrollX.toFloat()
-                Log.e("TAG", "onTouchEvent downX = $downX downY = $downY downScrollX = $downScrollX")
+                Log.e("TAG", "TwoPager onTouchEvent ACTION_DOWN downX = $downX downY = $downY downScrollX = $downScrollX")
             }
             MotionEvent.ACTION_MOVE -> {
                 val dx = (downX - event.x + downScrollX).toInt()
                     .coerceAtLeast(0) //当滑动到最左边时就不能再滑动了, 即 dx 不能小于 0
                     .coerceAtMost(width) //当滑动到最右边时就不能再滑动了, 即 dx 不能大于 width
-                Log.e("TAG", "onTouchEvent dx = $dx")
+                //Log.e("TAG", "onTouchEvent dx = $dx")
                 scrollTo(dx, 0)
+                Log.e("TAG", "TwoPager onTouchEvent ACTION_MOVE")
             }
             MotionEvent.ACTION_UP -> {
                 //计算速度, 速度 = 在 1000ms 内移动的像素数, 如果速度超过 maxVelocity, 那么 速度 = maxVelocity
@@ -106,7 +112,7 @@ class TwoPager(context: Context, attrs: AttributeSet) : ViewGroup(context, attrs
                 velocityTracker.computeCurrentVelocity(1000, maxVelocity.toFloat()) // 5m/s 5km/h
                 val vx = velocityTracker.xVelocity //速度即 1000ms 能移动的像素数, 如果改为 100 那么 vx 就会缩小 1/10
                 val scrollX = scrollX
-                Log.e("TAG", "onTouchEvent ACTION_UP vx = $vx scrollX = $scrollX")
+                Log.e("TAG", "TwoPager onTouchEvent ACTION_UP vx = $vx scrollX = $scrollX")
                 //如果 |水平速度| 小于最小速度, 即速度比较慢, 那么选择最近的一侧来吸附
                 val targetPage = if (abs(vx) < minVelocity) {
                     // 从右往左滑动时 scrollX 才是正的, 如果从右往左滑动并且超过了当前控件宽度的一半, 那么就选择第 1 张图, 否则选择第 0 张图

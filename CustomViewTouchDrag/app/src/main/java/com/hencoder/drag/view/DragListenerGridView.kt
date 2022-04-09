@@ -14,7 +14,7 @@ private const val COLUMNS = 2
 private const val ROWS = 3
 
 /**
- * 使用 OnDragListener 实现 长按拖拽 (注意: 需要长按才能拖拽)
+ * 使用 OnDragListener 实现 长按拖拽 (注意: 需要长按才能拖拽), 拖拽的图像是半透明的
  */
 class DragListenerGridView(context: Context?, attrs: AttributeSet?) : ViewGroup(context, attrs) {
     private var dragListener: OnDragListener = HenDragListener()
@@ -22,7 +22,7 @@ class DragListenerGridView(context: Context?, attrs: AttributeSet?) : ViewGroup(
     private var orderedChildren: MutableList<View> = ArrayList()
 
     init {
-        isChildrenDrawingOrderEnabled = true
+        isChildrenDrawingOrderEnabled = true // 获取当前这个ViewGroup是否是按照顺序进行绘制的
     }
 
     override fun onFinishInflate() {
@@ -33,6 +33,8 @@ class DragListenerGridView(context: Context?, attrs: AttributeSet?) : ViewGroup(
                 draggedView = longClickView
 
                 //使用过时的 startDrag() 方法, 手指移动的时候 longClickView 会自动跟随手指, 而不需要自己写移动代码
+                //startDrag() 可以传两个数据, data 和 myLocalState 都是数据
+                //区别是 myLocalState 是本地数据, 即随时随刻都能拿到的数据, 而 data 是只能在松手的时刻, 即 HenDragListener 的 onDrag() 中 event.action = DragEvent.ACTION_DROP 时才能拿到
                 //public final boolean startDrag(ClipData data, DragShadowBuilder shadowBuilder, Object myLocalState, int flags) { }
                 longClickView.startDrag(null, DragShadowBuilder(longClickView), longClickView, 0)
                 //使用不过时的方法 startDragAndDrop() 会提示 : Call requires API level 24 (current min is 21)
@@ -45,9 +47,11 @@ class DragListenerGridView(context: Context?, attrs: AttributeSet?) : ViewGroup(
         }
     }
 
+    //对于自定义 view 甚至可以不用写 dragListener, 直接重写 onDragEvent() 方法也行,
+    //不会只是被拖拽的 view 会回调这个 onDragEvent() 方法, 同样是所有的 view 都会回调这个方法, 并且无论是否设置 dragListener 该方法也会回调
+    //回调太多不会影响性能, 因为 super.onDragEvent(event) 只是返回了一个 false
     override fun onDragEvent(event: DragEvent?): Boolean {
         return super.onDragEvent(event)
-
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -95,22 +99,32 @@ class DragListenerGridView(context: Context?, attrs: AttributeSet?) : ViewGroup(
                     //将要拖拽的 view 手动隐藏, 否则拖拽时原先的位置还有刚才拖拽的 view
                     v.visibility = View.INVISIBLE
                 }
-                DragEvent.ACTION_DRAG_ENTERED -> if (event.localState !== v) {
+                //当手指触摸到某个 view 的区域内, 那么 onDrag() DragEvent.ACTION_DRAG_ENTERED 内的代码就会回调, 在 View 刚刚托起时也会触发, 因为自己进入了自己的范围内
+                DragEvent.ACTION_DRAG_ENTERED -> if (event.localState !== v) { //如果不在自己的范围内才会 sort 重排
                     sort(v)
                 }
+                //当手指离开某个 view 的区域, 和 DragEvent.ACTION_DRAG_ENTERED 正好是相反的
                 DragEvent.ACTION_DRAG_EXITED -> {
+
                 }
+                //因为 DragEvent.ACTION_DRAG_STARTED 的时候将原来的 view 隐藏了, 所以这里要再将其显示
                 DragEvent.ACTION_DRAG_ENDED -> if (event.localState === v) {
                     v.visibility = View.VISIBLE
+                }
+                DragEvent.ACTION_DROP -> { //松手的时候
+
                 }
             }
             return true
         }
     }
 
+    //因为是在 DragListener 的 onDrag() DragEvent.ACTION_DRAG_ENTERED 时调用的这个 sort(v) 方法, 传入的 targetView 就是要进入的区域的 view
+    //而这个 draggedView 是刚才长按监听触发时赋值的 longClickView
     private fun sort(targetView: View) {
         var draggedIndex = -1
         var targetIndex = -1
+        //找到要拖拽到该区域的 view (即 targetView) 的索引 targetIndex, 当前拖拽的 view (即 draggedView) 的索引 draggedIndex
         for ((index, child) in orderedChildren.withIndex()) {
             if (targetView === child) {
                 targetIndex = index
@@ -118,12 +132,14 @@ class DragListenerGridView(context: Context?, attrs: AttributeSet?) : ViewGroup(
                 draggedIndex = index
             }
         }
+        //将 orderedChildren 中的 targetView 和 draggedView 交换位置
         orderedChildren.removeAt(draggedIndex)
         orderedChildren.add(targetIndex, draggedView!!)
         var childLeft: Int
         var childTop: Int
         val childWidth = width / COLUMNS
         val childHeight = height / ROWS
+        //遍历 orderedChildren 中的 view, 依次修改 translationX 和 translationY 从而设置 view 的位置
         for ((index, child) in orderedChildren.withIndex()) {
             childLeft = index % 2 * childWidth
             childTop = index / 2 * childHeight

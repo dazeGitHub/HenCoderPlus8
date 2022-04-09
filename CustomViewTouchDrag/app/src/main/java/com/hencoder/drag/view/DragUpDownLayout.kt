@@ -39,6 +39,7 @@ class DragUpDownLayout(context: Context, attrs: AttributeSet?) : FrameLayout(con
             return child === draggedView
         }
 
+        //钳制方法只钳制了纵向(只能纵向滑动横向无法滑动), 即钳制了哪个方向哪个方向才可以移动
         override fun clampViewPositionVertical(child: View, top: Int, dy: Int): Int {
             return top
         }

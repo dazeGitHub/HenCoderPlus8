@@ -44,17 +44,22 @@ class DragUpDownLayout(context: Context, attrs: AttributeSet?) : FrameLayout(con
             return top
         }
 
+        //xvel 是水平速度, yvel 是垂直速度
         override fun onViewReleased(releasedChild: View, xvel: Float, yvel: Float) {
+            //如果垂直速度大于最小速度阈值, 那么向要移动到的那一侧停靠
             if (Math.abs(yvel) > viewConfiguration.scaledMinimumFlingVelocity) {
+                //如果是向下滑动
                 if (yvel > 0) {
                     dragHelper.settleCapturedViewAt(0, height - releasedChild.height)
                 } else {
                     dragHelper.settleCapturedViewAt(0, 0)
                 }
-            } else {
+            } else { //否则恢复到当前的一侧
+                //当 releasedChild.top == height - releasedChild.bottom 时, 拖动的 view 在界面中心
+                //所以 if (releasedChild.top < height - releasedChild.bottom) 拖动的 view 在靠近当前的一侧, 那么停靠到该侧
                 if (releasedChild.top < height - releasedChild.bottom) {
                     dragHelper.settleCapturedViewAt(0, 0)
-                } else {
+                } else { //拖动的 view 在要移动到的那一侧, 那么停靠到该侧
                     dragHelper.settleCapturedViewAt(0, height - releasedChild.height)
                 }
             }

@@ -30,6 +30,7 @@
         android:id="@+id/collectorLayout"
         android:layout_width="match_parent"
         android:layout_height="80dp"
+        android:orientation="horizontal"
         android:layout_alignParentBottom="true"
         android:background="#78909C"
         app:layout_constraintBottom_toBottomOf="parent"

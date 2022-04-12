@@ -1,6 +1,9 @@
 package com.hencoder.threadsync;
 
-public class Synchronized3Demo implements TestDemo {
+/**
+ * 演示死锁问题
+ */
+public class Synchronized5Demo implements TestDemo {
 
     private int x = 0;
     private int y = 0;
@@ -10,8 +13,11 @@ public class Synchronized3Demo implements TestDemo {
 
     private void count(int newValue) {
         synchronized (monitor1) {
-            x = newValue;   // monitor
+            x = newValue;
             y = newValue;
+            synchronized (monitor2) {
+//                name = ???;
+            }
         }
     }
 
@@ -25,6 +31,10 @@ public class Synchronized3Demo implements TestDemo {
     private synchronized void setName(String newName) {
         synchronized (monitor2) {
             name = newName;
+            synchronized (monitor1){
+//                x = ??;
+//                y = ??;
+            }
         }
     }
 

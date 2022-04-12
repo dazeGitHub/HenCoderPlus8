@@ -10,9 +10,10 @@ public class Main {
 //        threadFactory();
 //        executor();
 //        callable();
+//        runSynchronized0Demo();
 //        runSynchronized1Demo();
 //        runSynchronized2Demo();
-        runSynchronized3Demo();
+          runSynchronized3Demo();
 //        runReadWriteLockDemo();
     }
 
@@ -27,6 +28,7 @@ public class Main {
             }
         };
         thread.start();
+        //thread.run();
     }
 
     /**
@@ -50,6 +52,7 @@ public class Main {
             @Override
             public Thread newThread(Runnable r) {
                 return new Thread(r, "Thread-" + count.incrementAndGet()); // ++count
+                //count.getAndIncrement();// count++
             }
         };
 
@@ -75,14 +78,38 @@ public class Main {
         };
 
         Executor executor = Executors.newCachedThreadPool();
-        executor.execute(runnable);
-        executor.execute(runnable);
-        executor.execute(runnable);
+        //Executor executor = Executors.newSingleThreadExecutor();
 
-        ExecutorService myExecutor = new ThreadPoolExecutor(5, 100,
+        Executors.newFixedThreadPool(10);
+        //处理 Bitmap 是个爆发任务, 可以用完了线程就直接回收
+//        List<Bitmap> bitmaps = ...
+//        ExecutorService fixedExecutor = Executors.newFixedThreadPool(20);
+//        for(Bitmap bitmap : bitmaps){
+//            fixedExecutor.execute(processImageRunnable);
+//        }
+//        fixedExecutor.shutdown();
+//        processImageRunnable // processImages();
+
+//        Executors.newScheduledThreadPool()
+//        Executors.newSingleThreadScheduledExecutor();
+
+        executor.execute(runnable);
+        executor.execute(runnable);
+        executor.execute(runnable);
+    }
+
+    static void executorService(){
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Thread with Runnable started!");
+            }
+        };
+
+        ExecutorService myExecutorService = new ThreadPoolExecutor(5, 100,
                 5, TimeUnit.MINUTES, new SynchronousQueue<Runnable>());
 
-        myExecutor.execute(runnable);
+        myExecutorService.execute(runnable);
     }
 
     static void callable() {
@@ -113,6 +140,10 @@ public class Main {
         }
     }
 
+    static void runSynchronized0Demo(){
+        new Synchronized0Demo().runTest();
+    }
+
     static void runSynchronized1Demo() {
         new Synchronized1Demo().runTest();
     }
@@ -126,6 +157,6 @@ public class Main {
     }
 
     static void runReadWriteLockDemo() {
-        new ReadWriteLockDemo().runTest();
+        new ReadWriteLockDemo2().runTest();
     }
 }

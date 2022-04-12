@@ -1,19 +1,22 @@
 package com.hencoder.threadsync;
 
 class SingleMan {
-  private static volatile SingleMan sInstance;
 
-  private SingleMan() {
-  }
+    //volatile : 禁止发生 dex 指令重排
+    private static volatile SingleMan sInstance;
 
-  static SingleMan newInstance() {
-    if (sInstance == null) {
-      synchronized (SingleMan.class) {
-        if (sInstance == null) {
-          sInstance = new SingleMan();
-        }
-      }
+    private SingleMan() {
+
     }
-    return sInstance;
-  }
+
+    static SingleMan newInstance() {
+        if (sInstance == null) {
+            synchronized (SingleMan.class) {
+                if (sInstance == null) {
+                    sInstance = new SingleMan();
+                }
+            }
+        }
+        return sInstance;
+    }
 }

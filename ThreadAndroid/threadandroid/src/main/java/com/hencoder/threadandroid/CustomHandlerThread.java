@@ -3,7 +3,6 @@ package com.hencoder.threadandroid;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * 仿 Android 中的 HandlerThread
  */
 public class CustomHandlerThread extends Thread {
 
@@ -14,7 +13,6 @@ public class CustomHandlerThread extends Thread {
         looper.loop();
     }
 
-    //Looper 就是转圈器, 也就是循环器
     class Looper {
         private Runnable task;
         private AtomicBoolean quit = new AtomicBoolean(false);

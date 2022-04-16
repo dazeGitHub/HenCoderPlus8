@@ -9,7 +9,7 @@ public class Main {
             public void run() {
                 //...;
                 threadNumber.set(1);
-                threadNumber.get(); //1
+                System.out.println("threadNumber.set(1)   threadNumber.get() = " + threadNumber.get());//1
             }
         }.start();
         new Thread() {
@@ -17,7 +17,7 @@ public class Main {
             public void run() {
                 //...;
                 threadNumber.set(2);
-                threadNumber.get(); // 2
+                System.out.println("threadNumber.set(2)    threadNumber.get() = " + threadNumber.get());// 2
             }
         }.start();
     }

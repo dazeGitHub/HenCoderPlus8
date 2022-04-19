@@ -16,12 +16,12 @@
         android:layout_height="wrap_content"
         android:textSize="24sp" />
 
-    <!--<Button
+    <Button
         android:id="@+id/loadPluginBt"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_marginTop="8dp"
-        android:text="Load Plugin"/>-->
+        android:text="Load Plugin"/>
 
     <Button
         android:id="@+id/showTitleBt"

@@ -4,12 +4,13 @@ import android.animation.TypeEvaluator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
 import android.view.View
-import androidx.core.graphics.drawable.toBitmap
-import androidx.core.graphics.drawable.toDrawable
 import com.hencoder.animation.dp
+
+/**
+ * 字符串动态效果
+ */
 
 private val provinces = listOf(
     "北京市",
@@ -48,18 +49,15 @@ private val provinces = listOf(
     "澳门特别行政区"
 )
 
-class ProvinceView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
+class MyProvinceView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textSize = 80.dp
         textAlign = Paint.Align.CENTER
     }
-
     var province = "北京市"
-        set(value) {
+        set(value){
             field = value
             invalidate()
-            val drawable = ColorDrawable()
-            drawable.toBitmap().toDrawable(resources)
         }
 
     override fun onDraw(canvas: Canvas) {
@@ -69,7 +67,7 @@ class ProvinceView(context: Context?, attrs: AttributeSet?) : View(context, attr
     }
 }
 
-class ProvinceEvaluator : TypeEvaluator<String> {
+class MyProvinceEvaluator : TypeEvaluator<String> {
     override fun evaluate(fraction: Float, startValue: String, endValue: String): String {
         val startIndex = provinces.indexOf(startValue)
         val endIndex = provinces.indexOf(endValue)

@@ -6,8 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.hencoder.bitmapanddrawable.view.DrawableView
+    <!--  <com.hencoder.bitmapanddrawable.view.DrawableView  -->
+    <com.hencoder.bitmapanddrawable.view.MyDrawableView
         android:layout_width="300dp"
-        android:layout_height="400dp" />
+        android:layout_height="400dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,12 +8,12 @@ import com.hencoder.bitmapanddrawable.dp
 import com.hencoder.bitmapanddrawable.drawable.MeshDrawable
 
 class DrawableView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
-  private val drawable = MeshDrawable()
+    private val drawable = MeshDrawable()
 
-  override fun onDraw(canvas: Canvas) {
-    super.onDraw(canvas)
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
 
-    drawable.setBounds(50.dp.toInt(), 80.dp.toInt(), width, height)
-    drawable.draw(canvas)
-  }
+        drawable.setBounds(50.dp.toInt(), 80.dp.toInt(), width, height)
+        drawable.draw(canvas)
+    }
 }

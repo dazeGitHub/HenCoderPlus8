@@ -4,6 +4,9 @@ import android.graphics.Canvas
 import android.graphics.ColorFilter
 import android.graphics.drawable.Drawable
 
+/**
+ * 绘制股票的蜡烛图 Drawable
+ */
 class CandleDrawable : Drawable() {
   override fun draw(canvas: Canvas) {
     // 绘制蜡烛

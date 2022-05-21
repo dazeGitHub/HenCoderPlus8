@@ -13,7 +13,7 @@ class DetailedCandleView(context: Context?, attrs: AttributeSet?) : View(context
     super.onDraw(canvas)
 
     // 绘制蜡烛图
-    drawable.setBounds()
+    //drawable.setBounds()
     drawable.draw(canvas)
 
     // 绘制额外的完整信息

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!--  再加一个普通的 EdiText, 看 MyMaterialEditText 比 EditText 高多少 -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,20 +13,24 @@
 
         <EditText
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            />
     </FrameLayout>
 
+    <!--  EditText 的背景就是底下的横杠, 如果要查看 TEXT_SIZE 和 TEXT_MARGIN, 就不能直接设置背景,
+     那么可以直接为它加一个父 View, 然后设置父 View 的背景色。  -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#30ff0000">
 
-        <com.hencoder.materialedittext.view.MaterialEditText
-            android:id="@+id/met"
-            app:useFloatingLabel="false"
+        <!--    MyMaterialEditText    -->
+        <com.hencoder.materialedittext.view.MyMaterialEditText
+            android:id="@+id/my_material_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Username"/>
+            android:hint="Username"
+            app:useFloatingLabel="true"
+            />
     </FrameLayout>
-
 </LinearLayout>

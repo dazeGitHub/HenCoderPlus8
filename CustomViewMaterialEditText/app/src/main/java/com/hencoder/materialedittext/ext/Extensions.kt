@@ -1,4 +1,4 @@
-package com.hencoder.materialedittext
+package com.hencoder.materialedittext.ext
 
 import android.content.res.Resources
 import android.util.TypedValue

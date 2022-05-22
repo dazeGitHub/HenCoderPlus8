@@ -4,14 +4,15 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.view.postDelayed
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_my_main.*
 
-class MainActivity : AppCompatActivity() {
+class MyMainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_my_main)
 
-        met.postDelayed(3000) {
-            met.useFloatingLabel = false
-        }
+//        my_material_edit_text.postDelayed(10000){
+//            my_material_edit_text.useFloatingLabel = false
+//        }
     }
 }

@@ -3,11 +3,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="horizontal"
     tools:context=".MainActivity">
 
-    <com.hencoder.layoutsize.view.CircleView
+<!--    <ImageView-->
+<!--        android:layout_width="300dp"-->
+<!--        android:layout_height="200dp"-->
+<!--        android:scaleType = "centerCrop"-->
+<!--        android:src = "@drawable/avatar_rengwuxian"-->
+<!--        />-->
+
+<!--    <com.hencoder.layoutsize.view.SquareImageView-->
+<!--        android:layout_width="300dp"-->
+<!--        android:layout_height="200dp"-->
+<!--        android:scaleType="centerCrop"-->
+<!--        android:src = "@drawable/avatar_rengwuxian" />-->
+
+    <!--
+    <com.hencoder.layoutsize.view.MyCircleView
+        android:layout_width="300dp"
+        android:layout_height="200dp"
+        />
+    -->
+    <com.hencoder.layoutsize.view.MyCircleView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/colorAccent" />
+        android:background="@color/colorAccent"
+        />
+
+<!--    <View-->
+<!--        android:layout_width="300dp"-->
+<!--        android:layout_height="300dp"-->
+<!--        android:background="@color/colorAccent"-->
+<!--        />-->
 
 </LinearLayout>

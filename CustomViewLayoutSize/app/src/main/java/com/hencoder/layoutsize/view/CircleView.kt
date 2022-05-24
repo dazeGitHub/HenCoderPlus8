@@ -10,19 +10,22 @@ import com.hencoder.layoutsize.dp
 private val RADIUS = 100.dp
 private val PADDING = 100.dp
 
+/**
+ * CircleView 的尺寸和内部的圆形相关, 而不关心 父View 的测量结果
+ */
 class CircleView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
-  private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-  override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-    val size = ((PADDING + RADIUS) * 2).toInt()
-    val width = resolveSize(size, widthMeasureSpec)
-    val height = resolveSize(size, heightMeasureSpec)
-    setMeasuredDimension(width, height)
-  }
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val size = ((PADDING + RADIUS) * 2).toInt()
+        val width = resolveSize(size, widthMeasureSpec)
+        val height = resolveSize(size, heightMeasureSpec)
+        setMeasuredDimension(width, height)
+    }
 
-  override fun onDraw(canvas: Canvas) {
-    super.onDraw(canvas)
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
 
-    canvas.drawCircle(PADDING + RADIUS, PADDING + RADIUS, RADIUS, paint)
-  }
+        canvas.drawCircle(PADDING + RADIUS, PADDING + RADIUS, RADIUS, paint)
+    }
 }

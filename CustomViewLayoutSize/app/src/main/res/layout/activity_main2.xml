@@ -10,16 +10,19 @@
         android:background="#00ff00"
         />
 
-    <!--  android:layout_width="match_parent"  -->
-    <View
+    <!--
+        android:layout_width="match_parent"
         android:layout_width="240dp"
+     -->
+    <View
+        android:layout_width="match_parent"
         android:layout_height="80dp"
         android:background="#ff0000"
         />
 
     <!--  android:layout_width="match_parent"  -->
     <View
-        android:layout_width="160dp"
+        android:layout_width="match_parent"
         android:layout_height="80dp"
         android:background="#0000ff"
         />

@@ -13,14 +13,15 @@ class MeasuredSizeTestView(context: Context, attrs: AttributeSet?) : AppCompatIm
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        Log.e("TAG", "MeasuredSizeTestView onMeasure measuredWidth Pre = $measuredWidth")
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        Log.e("TAG", "MeasuredSizeTestView onMeasure super.onMeasure()")
         val widthSpecMode = MeasureSpec.getMode(widthMeasureSpec)
         val widthSpecSize = MeasureSpec.getSize(widthMeasureSpec)
         val heightSpecMode = MeasureSpec.getMode(heightMeasureSpec)
         val heightSpecSize = MeasureSpec.getSize(heightMeasureSpec)
         val measuredWidth = measuredWidth
-
-        Log.e("TAG", "MeasuredSizeTestView measuredWidth = $measuredWidth")
+        Log.e("TAG", "MeasuredSizeTestView onMeasure measuredWidth Back = $measuredWidth")
 //        Log.e("TAG", "MeasuredSizeTestView " +
 //                "widthSpecMode = $widthSpecMode widthSpecSize = $widthSpecSize " +
 //                "heightSpecMode = $heightSpecMode heightSpecSize = $heightSpecSize "

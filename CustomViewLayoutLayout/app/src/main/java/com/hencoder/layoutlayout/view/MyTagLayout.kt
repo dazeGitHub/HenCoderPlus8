@@ -14,9 +14,16 @@ class MyTagLayout(context: Context?, attrs: AttributeSet?) : ViewGroup(context, 
         //自己测量, 和 父View 如何测量无关, 所以这里注释掉
         //super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
-        var widthUsed = 0
-        var heightUsed = 0
+        //需要两个宽度 :
+        // 1. 最宽那行的宽度 : 用来最后 setMeasuredDimension(selfWidth, selfHeight)
+        // 2. 最下边最新的那行的宽度 : 判断是否需要折行
+        var maxLineWidthUsed = 0        //最宽那行的宽度
+        var totalPreHeightUsed = 0      //当前行之前所有行的总高度
+        var lastedlineWidthUsed = 0     //最下边最新的那行的宽度
         var lineMaxHeight = 0
+
+        val specWidthMode = MeasureSpec.getMode(widthMeasureSpec)
+        val specWidthSize = MeasureSpec.getSize(widthMeasureSpec)
 
         //先试试一行的
         //1. 先测量 子View 的尺寸
@@ -32,11 +39,18 @@ class MyTagLayout(context: Context?, attrs: AttributeSet?) : ViewGroup(context, 
             //heightUsed (已用高度) 的计算 :
             //初始的已用高度为 0, 直到换行后已用高度才是上一行最高的那一个
 
-            measureChildWithMargins(childView, widthMeasureSpec, 0, heightMeasureSpec, heightUsed) //多行这么干
+            measureChildWithMargins(childView, widthMeasureSpec, 0, heightMeasureSpec, totalPreHeightUsed) //多行这么干
             //measureChildWithMargins(childView, widthMeasureSpec, widthUsed, heightMeasureSpec, heightUsed)  //单行这么干
             //myMeasureChildWithMargins(childView, widthMeasureSpec, widthUsed, heightMeasureSpec, heightUsed)
 
-
+            if((specWidthMode != MeasureSpec.UNSPECIFIED) && (lastedlineWidthUsed + childView.measuredWidth > specWidthSize)){ //如果 父View 给的 specMode 不是 无限制的才符合
+                //因为刚才测量 childView 的时候地方不够, 所以需要折行, 折行的时候需要重新测量, 在重新测量前重置各种变量
+                lastedlineWidthUsed = 0
+                //折行时已用高度应该是之前的行的最高的 View 的高度之和, 所以用 +=
+                totalPreHeightUsed += lineMaxHeight
+                lineMaxHeight = 0
+                measureChildWithMargins(childView, widthMeasureSpec, 0, heightMeasureSpec, totalPreHeightUsed)
+            }
 
             //测量完后将 子View 的 left,top,right,bottom 都定好了, 保存到 childrenRounds 这个对应索引的 Rect 中
             //index 只有两种情况 : 小于 childrenRounds.size() 或者 等于 childrenRounds.size(),
@@ -48,18 +62,24 @@ class MyTagLayout(context: Context?, attrs: AttributeSet?) : ViewGroup(context, 
             //left 是 已用宽度(widthUsed), top 是 已用高度(heightUsed)
             //right 是 已用宽度(widthUsed) + 子View 的宽度(childView.measuredWidth)
             //bottom 是 已用高度(heightUsed) + 子View 的高度(childView.measuredHeight)
-            childBounds.set(widthUsed, heightUsed, widthUsed + childView.measuredWidth, heightUsed + childView.measuredHeight)
+            //这里应该用 lastedlineWidthUsed 而不是 widthUsed, widthUsed 把别的行的 View 的 measuredWidth 也加上了, 导致为 childBounds 设置 left 不准
+            childBounds.set(lastedlineWidthUsed, totalPreHeightUsed, lastedlineWidthUsed + childView.measuredWidth, totalPreHeightUsed + childView.measuredHeight)
 
-            //还需要不断更新 widthUsed 和 heightUsed
-            widthUsed += childView.measuredWidth
+            //还需要不断更新 widthUsed 和 heightUsed, 因为是计算当前行的已用宽度, 所以应当使用 lastedlineWidthUsed 替换 widthUsed
+            //widthUsed += childView.measuredWidth
+            lastedlineWidthUsed += childView.measuredWidth
+
+            //将当前行的宽度 lastedlineWidthUsed 和 总的宽度对比, 如果当前行更宽, 那么赋值给 总的宽度, 保证 maxLineWidthUsed 是最宽的那一行的宽度
+            maxLineWidthUsed = Math.max(maxLineWidthUsed, lastedlineWidthUsed)
 
             //每过一行增加上一行最高的那一个View 的高度
             lineMaxHeight = Math.max(lineMaxHeight, childView.measuredHeight)
         }
 
         //2. 算出自己的尺寸
-        val selfWidth = widthUsed
-        val selfHeight = lineMaxHeight
+        val selfWidth = maxLineWidthUsed
+        //val selfHeight = lineMaxHeight                       //这是计算的单行
+        val selfHeight = totalPreHeightUsed + lineMaxHeight    //这是计算的多行  selfHeight = 之前所有行的高度 + 当前行的最大高度
         setMeasuredDimension(selfWidth, selfHeight)
     }
 

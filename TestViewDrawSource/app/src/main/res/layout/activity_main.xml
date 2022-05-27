@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_on_create_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray"
+        android:gravity="center"
+        android:paddingVertical="10dp"
+        android:text="在 onCreate 中直接更新"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_child_thread_sleep_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray"
+        android:gravity="center"
+        android:paddingVertical="10dp"
+        android:layout_marginTop="10dp"
+        android:text="子线程休眠后再更新"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_click_event_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray"
+        android:gravity="center"
+        android:paddingVertical="10dp"
+        android:layout_marginTop="10dp"
+        android:text="在点击事件中更新"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_modify_tv_wrap_content_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray"
+        android:gravity="center"
+        android:paddingVertical="10dp"
+        android:layout_marginTop="10dp"
+        android:text="将 TextView 改为 wrap_content"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_pre_request_layout_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray"
+        android:gravity="center"
+        android:paddingVertical="10dp"
+        android:layout_marginTop="10dp"
+        android:text="先执行 requestLayout() 再更新"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_child_thread_add_view_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray"
+        android:gravity="center"
+        android:paddingVertical="10dp"
+        android:layout_marginTop="10dp"
+        android:text="子线程 addView()"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_surface_view_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray"
+        android:gravity="center"
+        android:paddingVertical="10dp"
+        android:layout_marginTop="10dp"
+        android:text="SurfaceView"
+        android:textStyle="bold" />
+
+</LinearLayout>

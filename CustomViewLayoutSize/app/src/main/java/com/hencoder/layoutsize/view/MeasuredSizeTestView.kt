@@ -22,21 +22,21 @@ class MeasuredSizeTestView(context: Context, attrs: AttributeSet?) : AppCompatIm
         val heightSpecSize = MeasureSpec.getSize(heightMeasureSpec)
         val measuredWidth = measuredWidth
         Log.e("TAG", "MeasuredSizeTestView onMeasure measuredWidth Back = $measuredWidth")
-//        Log.e("TAG", "MeasuredSizeTestView " +
-//                "widthSpecMode = $widthSpecMode widthSpecSize = $widthSpecSize " +
-//                "heightSpecMode = $heightSpecMode heightSpecSize = $heightSpecSize "
-//        )
-//
-//        if(widthSpecMode == MeasureSpec.EXACTLY){
-//            Log.e("TAG","widthSpecMode == MeasureSpec.EXACTLY")
-//        }else if(widthSpecMode == MeasureSpec.AT_MOST){
-//            Log.e("TAG","widthSpecMode == MeasureSpec.AT_MOST")
-//        }else{
-//            Log.e("TAG","widthSpecMode == MeasureSpec.UNSPECIFIED")
-//        }
-//
-//        if(heightSpecMode == MeasureSpec.EXACTLY){
-//            Log.e("TAG","heightSpecMode == MeasureSpec.EXACTLY")
-//        }
+        Log.e("TAG", "MeasuredSizeTestView " +
+                "widthSpecMode = $widthSpecMode widthSpecSize = $widthSpecSize " +
+                "heightSpecMode = $heightSpecMode heightSpecSize = $heightSpecSize "
+        )
+
+        if(widthSpecMode == MeasureSpec.EXACTLY){
+            Log.e("TAG","widthSpecMode == MeasureSpec.EXACTLY")
+        }else if(widthSpecMode == MeasureSpec.AT_MOST){
+            Log.e("TAG","widthSpecMode == MeasureSpec.AT_MOST")
+        }else{
+            Log.e("TAG","widthSpecMode == MeasureSpec.UNSPECIFIED")
+        }
+
+        if(heightSpecMode == MeasureSpec.EXACTLY){
+            Log.e("TAG","heightSpecMode == MeasureSpec.EXACTLY")
+        }
     }
 }

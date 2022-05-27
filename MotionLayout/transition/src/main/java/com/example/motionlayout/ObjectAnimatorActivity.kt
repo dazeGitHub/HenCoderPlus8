@@ -12,24 +12,24 @@ import com.example.motionlayout.util.dp
 
 class ObjectAnimatorActivity : AppCompatActivity() {
 
-  lateinit var root: ViewGroup
+    lateinit var root: ViewGroup
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_object_animator)
-    root = findViewById(R.id.root)
-  }
-
-  fun onClick(v: View) {
-    TransitionManager.beginDelayedTransition(root)
-
-    with(v.layoutParams as FrameLayout.LayoutParams) {
-      gravity = Gravity.CENTER
-      height *= 2
-      width *= 2
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_object_animator)
+        root = findViewById(R.id.root)
     }
 
-    v.requestLayout()
+    fun onClick(v: View) {
+        TransitionManager.beginDelayedTransition(root)
 
-  }
+        with(v.layoutParams as FrameLayout.LayoutParams) {
+            gravity = Gravity.CENTER
+            height *= 2
+            width *= 2
+        }
+
+        v.requestLayout()
+
+    }
 }

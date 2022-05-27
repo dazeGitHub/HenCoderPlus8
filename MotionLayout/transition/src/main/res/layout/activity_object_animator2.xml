@@ -36,5 +36,4 @@
         android:layout_height="80dp"
         android:src="@drawable/ic_heart_24dp" />
 
-
 </LinearLayout>

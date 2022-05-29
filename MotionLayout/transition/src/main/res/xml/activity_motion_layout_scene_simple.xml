@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        app:constraintSetEnd="@id/end"
+        app:constraintSetStart="@id/start"
+        app:duration="1000">
+        <KeyFrameSet>
+        </KeyFrameSet>
+<!--        <OnClick-->
+<!--            app:targetId="@+id/image_film_cover"-->
+<!--            app:clickAction="jumpToStart|transitionToEnd"-->
+<!--            />-->
+
+        <!--
+            app:dragDirection 表示过渡动画的进度是跟随向下移动的进度的
+            app:touchRegionId 表示触摸哪个控件响应过渡效果
+            app:onTouchUp 的值默认是 autocomplete, 如果改为 stop 就是滑动到哪停到哪,
+        -->
+        <OnSwipe
+            app:dragDirection="dragDown"
+            app:touchRegionId="@id/image_film_cover"
+            app:onTouchUp="autoComplete"
+            />
+    </Transition>
+
+    <!--
+        这里 id 为 start 的 ConstraintSet 节点完全对应于 activity_motion_layout.xml 布局, 所以这里不用写任何代码
+    -->
+    <ConstraintSet android:id="@+id/start">
+    </ConstraintSet>
+
+    <!--  但是 end 场景就必须写清楚哪些控件发生了改变  -->
+    <ConstraintSet android:id="@+id/end">
+
+        <!--  将从 activity_constraint_end.xml 中复制过来的 ImageView  改为 Constraint, 用来表示约束条件   -->
+        <!--   ImageView     -->
+        <Constraint
+            android:id="@+id/image_film_cover"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:contentDescription="@null"
+            android:src="@drawable/film_cover"
+            app:layout_constraintTop_toTopOf="@+id/background"
+            app:layout_constraintBottom_toBottomOf="@+id/background"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!--   FloatingActionButton     -->
+        <Constraint
+            android:id="@+id/fab_favourite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_bookmark_24dp"
+            android:tint="@color/colorBookMark"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/background"
+            app:layout_constraintTop_toBottomOf="@id/background"
+            app:fabSize="mini" />
+
+        <!--    View    -->
+        <Constraint
+            android:id="@+id/background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </ConstraintSet>
+
+</MotionScene>

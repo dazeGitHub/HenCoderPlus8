@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        app:constraintSetEnd="@id/end"
+        app:constraintSetStart="@id/start"
+        app:duration="3000">
+
+        <OnSwipe
+            app:dragDirection="dragDown"
+            app:touchAnchorSide="bottom" />
+
+        <KeyFrameSet>
+
+            <!--
+                循环关键帧 :
+                    app:wavePeriod 表示循环几次
+                    app:waveShape  表示循环的数学模型
+             -->
+            <!--  表示在起始位置 -->
+            <KeyCycle
+                app:framePosition="0"
+                android:rotation="0"
+                app:motionTarget="@id/view"
+                app:wavePeriod="0"
+                app:waveShape="sin"
+                />
+
+            <!--   表示在中间位置  -->
+            <KeyCycle
+                app:framePosition="50"
+                android:rotation="45"
+                app:motionTarget="@id/view"
+                app:wavePeriod="3"
+                app:waveShape="sin"
+                />
+
+            <!--   表示在结束位置  -->
+            <KeyCycle
+                app:framePosition="100"
+                android:rotation="0"
+                app:motionTarget="@id/view"
+                app:wavePeriod="0"
+                app:waveShape="sin"
+                />
+
+            <!--            <KeyTimeCycle-->
+            <!--                android:rotation="0"-->
+            <!--                app:framePosition="0"-->
+            <!--                app:motionTarget="@id/view"-->
+            <!--                app:wavePeriod="0"-->
+            <!--                app:waveShape="sin" />-->
+
+            <!--            <KeyTimeCycle-->
+            <!--                android:rotation="45"-->
+            <!--                app:framePosition="50"-->
+            <!--                app:motionTarget="@id/view"-->
+            <!--                app:wavePeriod="1"-->
+            <!--                app:waveShape="sin" />-->
+
+            <!--            <KeyTimeCycle-->
+            <!--                android:rotation="0"-->
+            <!--                app:framePosition="100"-->
+            <!--                app:motionTarget="@id/view"-->
+            <!--                app:wavePeriod="0"-->
+            <!--                app:waveShape="sin" />-->
+
+
+        </KeyFrameSet>
+    </Transition>
+
+    <ConstraintSet android:id="@+id/start">
+        <Constraint android:id="@+id/view">
+            <Motion app:pathMotionArc="startVertical"/>
+            <Layout
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </Constraint>
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+        <Constraint android:id="@+id/view">
+            <Layout
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginEnd="32dp"
+                android:layout_marginBottom="32dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+        </Constraint>
+    </ConstraintSet>
+</MotionScene>

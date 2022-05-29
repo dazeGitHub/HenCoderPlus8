@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        app:constraintSetEnd="@id/end"
+        app:constraintSetStart="@id/start"
+        app:duration="3000">
+
+        <OnSwipe
+            app:dragDirection="dragDown"
+            app:touchAnchorSide="bottom" />
+
+        <KeyFrameSet>
+
+            <!--
+                有 5 种关键帧 :
+                1. KeyAttribute
+                2.
+             -->
+            <!--
+                KeyAttribute (属性关键帧) :
+                    app:framePosition 指定动画进度到什么百分比的时候达到这个属性关键帧
+                    app:motionTarget  指定是哪个 View 执行这个关键帧
+             -->
+<!--            <KeyAttribute-->
+<!--                android:rotation="180"-->
+<!--                android:scaleX="1.5"-->
+<!--                android:scaleY="1.5"-->
+<!--                app:framePosition="50"-->
+<!--                app:motionTarget="@id/view" />-->
+
+            <!--
+                KeyPosition (位置关键帧) :
+                    app:percentY 表示在 Y 轴 25% 的地方
+                    app:percentX 表示在 X 轴 75% 的地方
+                    app:keyPositionType="parentRelative" 表示百分比是根据父容器 parent 来计算的
+                    app:pathMotionArc="flip" 让运动轨迹变为弧线的, none 是直线, flip 旋转
+                    但是要让这个属性生效, 必须要在运动路径的起点 id 为 start 的 ConstrainSet 里边的
+                    Constrain 里设置 <Motion app:pathMotionArc="startVertical"/>
+            -->
+
+<!--            <KeyPosition-->
+<!--                app:motionTarget="@id/view"-->
+<!--                app:framePosition="50"-->
+<!--                app:percentX="0.75"-->
+<!--                app:percentY="0.25"-->
+<!--                app:pathMotionArc="flip"-->
+<!--                app:keyPositionType="parentRelative"-->
+<!--                />-->
+
+<!--            <KeyPosition-->
+<!--                app:motionTarget="@id/view"-->
+<!--                app:framePosition="75"-->
+<!--                app:percentX="0.75"-->
+<!--                app:percentY="0.25"-->
+<!--                app:pathMotionArc="flip"-->
+<!--                app:keyPositionType="parentRelative"-->
+<!--                />-->
+
+<!--            <KeyPosition-->
+<!--                app:motionTarget="@id/view"-->
+<!--                app:framePosition="75"-->
+<!--                app:percentX="0.75"-->
+<!--                app:percentY="0.25"-->
+<!--                app:pathMotionArc="flip"-->
+<!--                app:keyPositionType="deltaRelative"-->
+<!--                />-->
+
+            <!-- 只留下一个位置关键帧 -->
+            <KeyPosition
+                app:motionTarget="@id/view"
+                app:framePosition="50"
+                app:percentX="0.5"
+                app:percentY="0.5"
+                app:pathMotionArc="flip"
+                app:keyPositionType="pathRelative"
+                />
+
+            <!--            <KeyTimeCycle-->
+            <!--                android:rotation="0"-->
+            <!--                app:framePosition="0"-->
+            <!--                app:motionTarget="@id/view"-->
+            <!--                app:wavePeriod="0"-->
+            <!--                app:waveShape="sin" />-->
+
+            <!--            <KeyTimeCycle-->
+            <!--                android:rotation="45"-->
+            <!--                app:framePosition="50"-->
+            <!--                app:motionTarget="@id/view"-->
+            <!--                app:wavePeriod="1"-->
+            <!--                app:waveShape="sin" />-->
+
+            <!--            <KeyTimeCycle-->
+            <!--                android:rotation="0"-->
+            <!--                app:framePosition="100"-->
+            <!--                app:motionTarget="@id/view"-->
+            <!--                app:wavePeriod="0"-->
+            <!--                app:waveShape="sin" />-->
+
+
+        </KeyFrameSet>
+    </Transition>
+
+    <ConstraintSet android:id="@+id/start">
+        <Constraint android:id="@+id/view">
+            <Motion app:pathMotionArc="startVertical"/>
+            <Layout
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </Constraint>
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+        <Constraint android:id="@+id/view">
+            <Layout
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginEnd="32dp"
+                android:layout_marginBottom="32dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+        </Constraint>
+    </ConstraintSet>
+</MotionScene>

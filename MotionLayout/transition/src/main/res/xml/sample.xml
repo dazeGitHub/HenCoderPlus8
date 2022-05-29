@@ -2,41 +2,21 @@
 <MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!--  app:motionInterpolator="bounce"  -->
     <Transition
         app:constraintSetEnd="@id/end"
         app:constraintSetStart="@id/start"
         app:duration="3000">
 
-        <OnSwipe app:touchAnchorId="@id/view"
+        <!--   为 Transition 使用 app:motionInterpolator="bounce" 设置反弹插值器的时候, 把 OnSwipe 标签改为 OnClick 标签  -->
+
+        <!--    <OnClick/>  -->
+
+        <!--   app:touchAnchorId="@id/view"     -->
+        <OnSwipe
             app:dragDirection="dragDown"
+            app:touchAnchorSide="bottom"
             />
-
-
-        <KeyFrameSet>
-
-            <KeyTimeCycle
-                android:rotation="0"
-                app:framePosition="0"
-                app:motionTarget="@id/view"
-                app:wavePeriod="0"
-                app:waveShape="sin" />
-
-            <KeyTimeCycle
-                android:rotation="45"
-                app:framePosition="50"
-                app:motionTarget="@id/view"
-                app:wavePeriod="1"
-                app:waveShape="sin" />
-
-            <KeyTimeCycle
-                android:rotation="0"
-                app:framePosition="100"
-                app:motionTarget="@id/view"
-                app:wavePeriod="0"
-                app:waveShape="sin" />
-
-
-        </KeyFrameSet>
 
         <!--        <OnSwipe-->
         <!--            app:dragDirection="dragDown"-->
@@ -47,12 +27,32 @@
     <ConstraintSet android:id="@+id/start">
         <Constraint android:id="@+id/view">
 
-            <Motion app:pathMotionArc="startVertical" />
+            <!--
+                app:pathMotionArc 的值 默认是 none 表示直线,  startVertical 表示垂直方向的曲线
+                app:transitionEasing 可以改变动画节奏, accelerate 表示越来越快 (用于控件离开屏幕), decelerate 表示越来越慢 (用于控件进入屏幕)
+                这个是针对 id 为 view 的控件, 如果是针对整个 Transition, 可以通过设置插值器的方式改变动画节奏
+            -->
+<!--            <Motion-->
+<!--                app:pathMotionArc="startVertical"-->
+<!--                app:transitionEasing="accelerate"-->
+<!--                />-->
             <Layout
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <!--
+                设置背景颜色 :
+                    app:attributeName="backgroundColor"
+                    app:customColorValue="@color/colorPrimary"
+                设置饱和度 :
+                    起始的饱和度是满的, 所以 CustomAttribute 的 app:customFloatValue 的值是 1
+            -->
+            <CustomAttribute
+                app:attributeName="Saturation"
+                app:customFloatValue="1"
+                />
 
         </Constraint>
     </ConstraintSet>
@@ -60,12 +60,35 @@
 
     <ConstraintSet android:id="@+id/end">
         <Constraint android:id="@+id/view">
+            <!--
+                为了防止 View 放大后超出屏幕, 好像看起来不会变大, layout_marginEnd 和 layout_marginBottom 都添加 32dp 的间距
+                但是 MotionLayout 不支持 android:layout_margin 属性, 所以不能使用 android:layout_margin = "32dp"
+             -->
             <Layout
                 android:layout_width="80dp"
                 android:layout_height="80dp"
+                android:layout_marginEnd="32dp"
+                android:layout_marginBottom="32dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+            <!--  动画达到结束场景时, 正好达到 Transform 设定的效果  -->
+            <Transform
+                android:rotation="360"
+                android:scaleX="1.5"
+                android:scaleY="1.5"
+                />
+            <!--
+                自定义属性名为 backgroundColor, 到时候会通过拼接 set 和 get 反射找到真正的函数名,
+                例如这里就会调用 setBackgroundColor() 方法, 还需要往拼接出来的方法里传入那个值的类型
+
+                app:attributeName="backgroundColor"
+                app:customColorValue="@color/colorAccent"
+            -->
+            <CustomAttribute
+                app:attributeName="Saturation"
+                app:customFloatValue="0"
+                />
         </Constraint>
     </ConstraintSet>
 </MotionScene>

@@ -11,12 +11,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
+        <activity
+            android:name=".MotionActivitySimple"
+            android:exported="false" />
         <activity android:name=".ObjectAnimatorActivity" />
         <activity android:name=".ObjectAnimator2Activity" />
         <activity android:name=".Go" />
         <activity android:name=".ConstraintSetExample" />
-        <activity android:name=".MotionActivity"/>
+        <activity android:name=".MotionActivity" />
         <activity android:name=".SampleActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>

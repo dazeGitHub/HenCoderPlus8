@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        app:constraintSetEnd="@id/end"
+        app:constraintSetStart="@id/start"
+        app:duration="3000">
+
+        <OnSwipe
+            app:dragDirection="dragDown"
+            app:touchAnchorSide="bottom" />
+
+        <KeyFrameSet>
+
+            <!--
+                app:framePosition="80" : 指定在动画进度 80% 的时候,
+                app:onPositiveCross="hide" : 过渡动画是正向的时候, 去调用它的 hide 方法 (消失)
+                有时想要的方法并不在控件上边, 那么就可以给控件设置 TransitionListener 监听来接收 Trigger 事件
+            -->
+            <KeyTrigger
+                app:motionTarget="@id/view"
+                app:framePosition="80"
+                app:onPositiveCross="hide"
+                />
+
+        </KeyFrameSet>
+    </Transition>
+
+    <ConstraintSet android:id="@+id/start">
+        <Constraint android:id="@+id/view">
+            <Motion app:pathMotionArc="startVertical"/>
+            <Layout
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </Constraint>
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+        <Constraint android:id="@+id/view">
+            <Layout
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginEnd="32dp"
+                android:layout_marginBottom="32dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+        </Constraint>
+    </ConstraintSet>
+</MotionScene>

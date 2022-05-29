@@ -32,6 +32,9 @@ class Go : AppCompatActivity(), View.OnClickListener {
             TransitionManager.go(startScene)
         }
 
+        //切换场景后又绑定了数据 和 设置了点击事件, 如果注释掉 bindData() 那么只有首次点击封面图生效
+        //因为 起始场景 和 结束场景 的封面图是两个不同的对象, 动画开始的时候 起始场景中的布局对象已经被移除了,
+        //所以动画结束场景的布局对象还需要设置一次点击事件, 同时其他数据也再绑定一次, 这也是过渡动画不好用的地方
         bindData()
         toggle = !toggle
     }

@@ -19,7 +19,8 @@ class ConstraintSetExample : AppCompatActivity(), View.OnClickListener {
         findViewById<ImageView>(R.id.image_film_cover).setOnClickListener(this)
         findViewById<RatingBar>(R.id.rating_film_rating).rating = 4.5f
         findViewById<TextView>(R.id.text_film_title).text = getString(R.string.film_title)
-        findViewById<TextView>(R.id.text_film_description).text = getString(R.string.film_description)
+        findViewById<TextView>(R.id.text_film_description).text =
+            getString(R.string.film_description)
     }
 
     private var toggle = true
